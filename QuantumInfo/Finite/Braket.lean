@@ -113,9 +113,13 @@ theorem Bra.apply' (ψ : Ket d) (i : d) : 〈ψ∣ i = conj (ψ.vec i) :=
   rfl
 
 theorem Ket.exists_ne_zero (ψ : Ket d) : ∃ x, ψ x ≠ 0 := by
+  -- まずノルムの二乗和が0より大きいことを示す
   have hzerolt : ∑ x : d, Complex.normSq (ψ x) > ∑ x : d, 0 := by rw [ψ.normalized, Finset.sum_const_zero]; exact zero_lt_one
+  -- 次に、ノルムの二乗和が0より大きいことから、ノルムの二乗が0より大きいxが存在することを示す
   have hpos : ∃ x ∈ Finset.univ, 0 < Complex.normSq (ψ x) := Finset.exists_lt_of_sum_lt hzerolt
+  -- そのxを取得する
   obtain ⟨x, _, hpos⟩ := hpos
+  -- 複素数が0でないこととノルムの二乗が0でないことは同値である
   rw [Complex.normSq_pos] at hpos
   use x
 
@@ -202,9 +206,11 @@ instance instFunLikeBraket : FunLike (Bra d) (Ket d) ℂ where
 
 /-- The inner product of any state with itself is 1. -/
 theorem Braket.dot_self_eq_one (ψ : Ket d) :〈ψ‖ψ〉= 1 := by
+  --  ψ x とそれの共役の積はψ xのノルムの二乗に等しい
   have h₁ : ∀x, conj (ψ x) * ψ x = Complex.normSq (ψ x) := fun x ↦ by
     rw [Complex.normSq_eq_conj_mul_self]
   simp only [dot, Bra.eq_conj, h₁]
+  -- すべてのxに対してノルムの二乗を足すと1になる
   have h₂ := congrArg Complex.ofReal ψ.normalized
   simpa using h₂
 
@@ -217,12 +223,13 @@ def Ket.prod (ψ₁ : Ket d₁) (ψ₂ : Ket d₂) : Ket (d₁ × d₂) where
   normalized' := by
     simp only [Fintype.sum_prod_type, norm_mul, ← Complex.normSq_eq_norm_sq, mul_pow,
       ← Finset.mul_sum, ψ₂.normalized, mul_one, ψ₁.normalized]
-
+-- テンソル積の定義
 notation ψ₁ "⊗" ψ₂ => Ket.prod ψ₁ ψ₂
 
 /-- A Ket is a product if it's `Ket.prod` of two kets. -/
 def Ket.IsProd (ψ : Ket (d₁ × d₂)) : Prop := ∃ ξ φ, ψ = ξ ⊗ φ
 
+-- テンソル積でかけないときに、エンタングルしていると考える
 /-- A Ket is entangled if it's not `Ket.prod` of two kets. -/
 def Ket.IsEntangled (ψ : Ket (d₁ × d₂)) : Prop := ¬ψ.IsProd
 
@@ -240,10 +247,13 @@ theorem Ket.not_IsEntangled_prod (ψ₁ : Ket d₁) (ψ₂ : Ket d₂) : ¬(ψ�
 theorem Ket.IsProd_iff_mul_eq_mul (ψ : Ket (d₁ × d₂)) : ψ.IsProd ↔
     ∀ i₁ i₂ j₁ j₂, ψ (i₁,j₁)  * ψ (i₂,j₂) = ψ (i₁,j₂) * ψ (i₂,j₁) := by
   constructor
+  -- →の証明
   · rintro ⟨ξ,φ,rfl⟩ i₁ i₂ j₁ j₂
     simp only [prod, apply]
     ring_nf
+  -- ←の証明
   · intro hcrossm
+    -- まず、ψの非ゼロ成分を取得する
     obtain ⟨⟨a, b⟩, hψnonZero⟩ := Ket.exists_ne_zero ψ
     -- May be able to simplify proof below by using Ket.normalize
     let v₁ : d₁ → ℂ := fun x => ‖ψ (a, b)‖ / (ψ (a, b)) * ((ψ (x, b)) / √(∑ i : d₁, ‖ψ (i, b)‖^2))
