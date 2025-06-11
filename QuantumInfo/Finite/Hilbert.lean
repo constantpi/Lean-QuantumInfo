@@ -5,6 +5,7 @@ import Mathlib.Data.Fin.Basic
 import Mathlib.Algebra.Module.LinearMap.Defs
 import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.Topology.Bases
+import Mathlib.LinearAlgebra.Trace
 
 -- 2次元の複素ヒルベルト空間を具体的に定義
 noncomputable def TwoDimComplexHilbertSpace : Type :=
@@ -40,9 +41,9 @@ noncomputable def get_dimension : Nat :=
 --   FiniteDimensional ℂ Qudit
 
 -- 半正定値エルミート線形作用素の定義
--- 有界性は連続性から導かれる
+-- 有界性はそのそも有限次元なので問題ない
 def PosSemiDefiniteHermitOperator : Type :=
-  { f : Qudit →ₗ[ℂ] Qudit // Continuous f ∧ ∀ x y : Qudit, ⟪f.1 x, y⟫ = ⟪x, f.1 y⟫ ∧ ∀ x: Qudit, 0 ≤  ⟪f.1 x, x⟫.re }
+  { f : Qudit →ₗ[ℂ] Qudit // ∀ x y : Qudit, ⟪f.1 x, y⟫ = ⟪x, f.1 y⟫ ∧ ∀ x: Qudit, 0 ≤  ⟪f.1 x, x⟫.re }
 
 -- 適当な基底を用いてトレースを定義する
 def basis : Basis (Fin (Module.finrank ℂ Qudit)) ℂ Qudit :=
@@ -58,15 +59,14 @@ def basis : Basis (Fin (Module.finrank ℂ Qudit)) ℂ Qudit :=
 -- 密度行列の定義
 def DensityOperator : Type :=
   { f : Qudit →ₗ[ℂ] Qudit // Continuous f ∧ ∀ x y : Qudit, ⟪f.1 x, y⟫ = ⟪x, f.1 y⟫ ∧ ∀ x: Qudit, 0 ≤  ⟪f.1 x, x⟫.re
-  -- ∧
-  -- -- トレースが1であること
-  -- (
-  --  let dim := Module.finrank ℂ Qudit
-  --  let basis := Basis.ofFiniteDimensional ℂ Qudit
-  --  let trace_value := (Finset.univ : Finset (Fin dim)).sum fun i => ⟪f.1 (basis i), basis i⟫
-  --  trace_value = 1)
+  ∧ LinearMap.trace ℂ Qudit f = 1 }
 
-  }
+noncomputable instance : AddCommMonoid DensityOperator :=
+  interInstance
+
+-- 量子チャンネルの定義
+def QuantumChannel : Type :=
+  { f : DensityOperator →ₗ[ℂ] DensityOperator // Continuous f}
 
   -- TODO:測定とチャンネル(QuantumChannel)
   -- operatorをoperatorに移す線形写像
