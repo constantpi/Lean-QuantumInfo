@@ -26,7 +26,9 @@ information that they are all in the range [0,1].
 def Distribution (α : Type u) [Fintype α] : Type u :=
   { f : α → Prob // Finset.sum Finset.univ (fun i ↦ (f i : ℝ)) = 1 }
 
+
 namespace Distribution
+
 
 variable {α β : Type*} [Fintype α] [Fintype β]
 
@@ -38,6 +40,15 @@ def mk' (f : α → ℝ) (h₁ : ∀i, 0 ≤ f i) (hN : ∑ i, f i = 1) : Distri
     simp [← hN, Fintype.sum_eq_sum_compl_add x]
     exact Finset.sum_nonneg' h₁
   ⟨ fun i ↦ ⟨f i, ⟨h₁ i, h₃ i⟩⟩, hN⟩
+
+def example_distribution : Distribution (Fin 2) :=
+  mk' (fun i ↦ if i = 0 then 1 else 0) (by
+  intro i
+  fin_cases i
+  . simp
+  . simp
+  ) (by simp [Finset.sum_ite_eq])
+
 
 instance instFunLikeProb : FunLike (Distribution α) α Prob where
   coe p a := p.1 a
