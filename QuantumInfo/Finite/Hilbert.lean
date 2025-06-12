@@ -51,22 +51,17 @@ noncomputable instance tensor_product_qudit_type (Qudit1 Qudit2 : Type) [QuditTy
   QuditType (TensorProduct ℂ Qudit1 Qudit2) :=
 {
   -- NormedAddCommGroup のインスタンス
-  norm:= sorry,
+  toAddCommGroup := TensorProduct.addCommGroup,
+
+  -- InnerProductSpace のインスタンス
+  toInnerProductSpace := sorry,
+  norm := sorry,
   dist_self := sorry,
   dist_comm := sorry,
   dist_triangle := sorry,
   eq_of_dist_eq_zero := sorry,
-  smul_zero := sorry,
-  smul_add := sorry,
-  add_smul := sorry,
-  zero_smul := sorry,
-  inner := sorry,
-  norm_smul_le :=sorry,
-  norm_sq_eq_re_inner:=sorry,
-  conj_inner_symm:=sorry,
-  add_left := sorry,
-  smul_left := sorry,
   fg_top := sorry,
+
 }
 
 
