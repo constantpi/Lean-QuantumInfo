@@ -97,8 +97,10 @@ instance (Qudit : Type) [QuditType Qudit] : Module ℂ (LinearOperatorSet Qudit)
 
 
 -- Qudit1, Qudit2上の線形写像のテンソル積を定義
-noncomputable def TensorProductMap [QuditType Qudit1] [QuditType Qudit2] (f1: LinearOperatorSet Qudit1) (f2: LinearOperatorSet Qudit2)  : LinearOperatorSet (TensorProduct ℂ Qudit1 Qudit2) :=
-  TensorProduct.map f1 f2
+noncomputable def TensorProductMap [QuditType Qudit1] [QuditType Qudit2] (f1: LinearOperatorSet Qudit1 →ₗ[ℂ] LinearOperatorSet Qudit1) (f2: LinearOperatorSet Qudit2 →ₗ[ℂ] LinearOperatorSet Qudit2)  : LinearOperatorSet (TensorProduct ℂ Qudit1 Qudit2) →ₗ[ℂ] LinearOperatorSet (TensorProduct ℂ Qudit1 Qudit2) :=
+  -- TensorProduct.map f1 f2
+  sorry
+
 
 def is_positive_map[QuditType H_in] [QuditType H_out] (φ : LinearOperatorSet H_in →ₗ[ℂ] LinearOperatorSet H_out)  : Prop :=
   --
@@ -111,11 +113,22 @@ instance (Qudit : Type) [QuditType Qudit] : AddCommMonoid (LinearOperatorSet Qud
 
 
 def QuantumChannel (H_in H_out : Type) [QuditType H_in] [QuditType H_out] : Type :=
-  { φ : LinearOperatorSet H_in →ₗ[ℂ] LinearOperatorSet H_out //
+  { φ : LinearOperatorSet H_in →ₗ[ℂ] LinearOperatorSet H_in //
   -- トレースを保存する
-  ∀ (f: LinearOperatorSet H_in), LinearMap.trace ℂ H_in f = LinearMap.trace ℂ H_out (φ f)
+  ∀ (f: LinearOperatorSet H_in), LinearMap.trace ℂ H_in f = LinearMap.trace ℂ H_in (φ f)
   -- 完全正定値写像
-  }
+  -- 任意の線形空間上の恒等写像とのテンソル積がis_positive_mapである
+  ∧ ∀ (Z : Type) [QuditType Z], ∀ (f: LinearOperatorSet Z →ₗ[ℂ] LinearOperatorSet Z),
+  -- fが恒等写像であることを確認
+  (∀ x :LinearOperatorSet Z, f.1 x = x) → is_positive_map (TensorProductMap φ f) }
+
+  -- ∧ ∀ (H_in' : Type) [QuditType H_in'] [AddCommMonoid H_in'] [Module ℂ H_in'] [AddCommMonoid H_in'],
+  -- ∀ (f : LinearOperatorSet H_in'),
+  -- -- fが恒等写像であることを確認
+  -- -- そのときfとφのテンソル積がis_positive_mapであることを確認
+  -- (∀ x : H_in', 0 ≤ ⟪f.1 x, x⟫.re) → is_positive_map (TensorProduct.map φ f)
+
+
 
 
   -- TODO:測定とチャンネル(QuantumChannel)
