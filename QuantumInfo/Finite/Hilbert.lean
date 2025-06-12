@@ -129,5 +129,12 @@ def QuantumChannel (H_in H_out : Type) [QuditType H_in] [QuditType H_out] : Type
 -- Linear map
 -- from LinearOperator(H_in) to LinearOperator(H_out)
 
+-- 測定を定義する
+-- 測定とはPosSemiDefiniteHermitOperatorの有限個の集合であり、それらの和が恒等写像になるもの
+def MeasurementOperator (Qudit : Type) [QuditType Qudit] : Type :=
+  { M : Finset (PosSemiDefiniteHermitOperator Qudit) //
+  -- 和が恒等写像になる
+  Finset.sum M (fun f => f.1) = LinearMap.id
+  }
 
 end HilbertSpaceOperations
