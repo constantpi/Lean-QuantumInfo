@@ -73,18 +73,14 @@ def PosSemiDefiniteHermitOperator (Qudit : Type) [QuditType Qudit] : Type :=
 
 -- 密度行列の定義
 def DensityOperator (Qudit : Type) [QuditType Qudit] : Type :=
-  { f : Qudit →ₗ[ℂ] Qudit // Continuous f ∧ ∀ x y : Qudit, ⟪f.1 x, y⟫ = ⟪x, f.1 y⟫ ∧ ∀ x: Qudit, 0 ≤  ⟪f.1 x, x⟫.re
-  ∧ LinearMap.trace ℂ Qudit f = 1 }
+  { f : Qudit →ₗ[ℂ] Qudit //
+   ∀ x y : Qudit, ⟪f.1 x, y⟫ = ⟪x, f.1 y⟫
+   ∧ ∀ x: Qudit, 0 ≤  ⟪f.1 x, x⟫.re
+   ∧ LinearMap.trace ℂ Qudit f = 1 }
 
 -- QuditType クラスの型 Qudit を受け取り、Qudit から Qudit への線形写像の集合を返す関数
 def LinearOperatorSet (Qudit : Type) [QuditType Qudit] : Type :=
   Qudit →ₗ[ℂ] Qudit
-
-
--- AddCommMonoid のインスタンスを定義
--- instance (Qudit : Type) [QuditType Qudit] : AddCommMonoid (LinearOperatorSet Qudit) where
---   add := sorry
---   zero := sorry
 
 -- AddCommMonoid のインスタンスを定義
 instance (Qudit : Type) [QuditType Qudit] : AddCommMonoid (LinearOperatorSet Qudit) :=
@@ -117,10 +113,10 @@ def QuantumChannel (H_in H_out : Type) [QuditType H_in] [QuditType H_out] : Type
   -- トレースを保存する
   ∀ (f: LinearOperatorSet H_in), LinearMap.trace ℂ H_in f = LinearMap.trace ℂ H_out (φ f)
   -- 完全正定値写像
-  -- 任意の線形空間上の恒等写像とのテンソル積がis_positive_mapである
-  ∧ ∀ (Z : Type) [QuditType Z], ∀ (f: LinearOperatorSet Z →ₗ[ℂ] LinearOperatorSet Z),
-  -- fが恒等写像であることを確認
-  (∀ x :LinearOperatorSet Z, f.1 x = x) → is_positive_map (TensorProductMap φ f) }
+  -- -- 任意の線形空間上の恒等写像とのテンソル積がis_positive_mapである
+  ∧ ∀ (Z : Type) [QuditType Z],
+    is_positive_map (TensorProductMap φ (LinearMap.id : LinearOperatorSet Z →ₗ[ℂ] LinearOperatorSet Z))
+  }
 
   -- TODO:測定とチャンネル(QuantumChannel)
   -- operatorをoperatorに移す線形写像
