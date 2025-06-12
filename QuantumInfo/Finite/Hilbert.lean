@@ -6,6 +6,8 @@ import Mathlib.Algebra.Module.LinearMap.Defs
 import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.Topology.Bases
 import Mathlib.LinearAlgebra.Trace
+import Mathlib.LinearAlgebra.TensorProduct.Basic
+-- import Mathlib.Analysis.InnerProductSpace.TensorProduct
 
 noncomputable instance : RCLike ℂ := inferInstance
 -- 名前空間を定義
@@ -16,7 +18,7 @@ namespace HilbertSpaceOperations
 --   [InnerProductSpace ℂ Qudit] [CompleteSpace Qudit] [TopologicalSpace.SeparableSpace Qudit] [FiniteDimensional ℂ Qudit]
 
 -- QuditType を定義
-class QuditType (a : Type) extends NormedAddCommGroup a, InnerProductSpace ℂ a, CompleteSpace a, TopologicalSpace.SeparableSpace a, FiniteDimensional ℂ a
+class QuditType (a : Type) extends NormedAddCommGroup a, InnerProductSpace ℂ a,FiniteDimensional ℂ a
 
 -- ベクトルの加算
 def vector_addition  (x y : Qudit) [QuditType Qudit]: Qudit := x + y
@@ -38,6 +40,36 @@ noncomputable def get_dimension (Qudit : Type) [QuditType Qudit] : Nat :=
 -- noncomputable def is_finite_dimensional : Prop :=
 --   FiniteDimensional ℂ Qudit
 
+def tensor_product (Qudit1 Qudit2 : Type) [QuditType Qudit1] [QuditType Qudit2] : Type :=
+  TensorProduct ℂ  Qudit1 Qudit2
+
+
+
+
+-- tensor_product が QuditType であることを証明
+noncomputable instance tensor_product_qudit_type (Qudit1 Qudit2 : Type) [QuditType Qudit1] [QuditType Qudit2] :
+  QuditType (TensorProduct ℂ Qudit1 Qudit2) :=
+{
+  -- NormedAddCommGroup のインスタンス
+  norm:= sorry,
+  dist_self := sorry,
+  dist_comm := sorry,
+  dist_triangle := sorry,
+  eq_of_dist_eq_zero := sorry,
+  smul_zero := sorry,
+  smul_add := sorry,
+  add_smul := sorry,
+  zero_smul := sorry,
+  inner := sorry,
+  norm_smul_le :=sorry,
+  norm_sq_eq_re_inner:=sorry,
+  conj_inner_symm:=sorry,
+  add_left := sorry,
+  smul_left := sorry,
+  fg_top := sorry,
+}
+
+
 -- 半正定値エルミート線形作用素の定義
 -- 有界性はそのそも有限次元なので問題ない
 def PosSemiDefiniteHermitOperator (Qudit : Type) [QuditType Qudit] : Type :=
@@ -54,7 +86,6 @@ def LinearOperatorSet (Qudit : Type) [QuditType Qudit] : Type :=
   Qudit →ₗ[ℂ] Qudit
 
 
-
 -- AddCommMonoid のインスタンスを定義
 -- instance (Qudit : Type) [QuditType Qudit] : AddCommMonoid (LinearOperatorSet Qudit) where
 --   add := sorry
@@ -67,6 +98,21 @@ instance (Qudit : Type) [QuditType Qudit] : AddCommMonoid (LinearOperatorSet Qud
 -- module のインスタンスを定義
 instance (Qudit : Type) [QuditType Qudit] : Module ℂ (LinearOperatorSet Qudit) :=
   LinearMap.module
+
+
+
+-- Qudit1, Qudit2上の線形写像のテンソル積を定義
+noncomputable def TensorProductMap [QuditType Qudit1] [QuditType Qudit2] (f1: LinearOperatorSet Qudit1) (f2: LinearOperatorSet Qudit2)  : LinearOperatorSet (TensorProduct ℂ Qudit1 Qudit2) :=
+  TensorProduct.map f1 f2
+
+def is_positive_map[QuditType H_in] [QuditType H_out] (φ : LinearOperatorSet H_in →ₗ[ℂ] LinearOperatorSet H_out)  : Prop :=
+  --
+  ∀ (f : LinearOperatorSet H_in),
+    (∀ x : H_in, 0 ≤ ⟪f.1 x, x⟫.re) →
+    (∀ y : H_out, 0 ≤ ⟪(φ f).1 y, y⟫.re)
+
+instance (Qudit : Type) [QuditType Qudit] : AddCommMonoid (LinearOperatorSet Qudit) :=
+  LinearMap.addCommMonoid
 
 
 def QuantumChannel (H_in H_out : Type) [QuditType H_in] [QuditType H_out] : Type :=
