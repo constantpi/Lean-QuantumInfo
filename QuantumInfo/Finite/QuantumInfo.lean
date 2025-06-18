@@ -7,15 +7,11 @@ import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.Topology.Bases
 import Mathlib.LinearAlgebra.Trace
 import Mathlib.LinearAlgebra.TensorProduct.Basic
--- import Mathlib.Analysis.InnerProductSpace.TensorProduct
 
 noncomputable instance : RCLike ℂ := inferInstance
 -- 名前空間を定義
 namespace HilbertSpaceOperations
 
--- 複素ヒルベルト空間を定義
--- variable {Qudit : Type} [NormedAddCommGroup Qudit]
---   [InnerProductSpace ℂ Qudit] [CompleteSpace Qudit] [TopologicalSpace.SeparableSpace Qudit] [FiniteDimensional ℂ Qudit]
 
 -- QuditType を定義
 class QuditType (a : Type) extends NormedAddCommGroup a, InnerProductSpace ℂ a,FiniteDimensional ℂ a
@@ -36,14 +32,8 @@ def inner_product (x y : Qudit)  [QuditType Qudit]: ℂ := ⟪x, y⟫
 noncomputable def get_dimension (Qudit : Type) [QuditType Qudit] : Nat :=
   Module.finrank ℂ Qudit
 
--- -- ヒルベルト空間が有限次元であることを表す命題
--- noncomputable def is_finite_dimensional : Prop :=
---   FiniteDimensional ℂ Qudit
-
 def tensor_product (Qudit1 Qudit2 : Type) [QuditType Qudit1] [QuditType Qudit2] : Type :=
   TensorProduct ℂ  Qudit1 Qudit2
-
-
 
 
 -- tensor_product が QuditType であることを証明
